@@ -1,11 +1,11 @@
 from copy import deepcopy
 import re
-import lxml
 from typing import Any, List, Tuple, Union
 from collections import OrderedDict
 from newspaper.configuration import Configuration
 import newspaper.parsers as parsers
 from newspaper.extractors.defines import AUTHOR_ATTRS, AUTHOR_STOP_WORDS, AUTHOR_VALS
+import lxml.html
 
 
 class AuthorsExtractor:
@@ -134,6 +134,11 @@ class AuthorsExtractor:
         def getpath(node):
             if doc_root is not None:
                 return doc_root.getpath(node)
+
+        # Check for the specific HTML structure for author extraction
+        byline_author = doc.xpath('//div[@class="col-12 byline"]/span/a/span[@class="font-weight-bold"]/text()')
+        if byline_author:
+            authors.extend(byline_author)
 
         # TODO: be more specific, not a combination of all attributes and values
         for attr in AUTHOR_ATTRS:
